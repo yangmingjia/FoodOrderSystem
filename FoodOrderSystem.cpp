@@ -245,7 +245,7 @@ void FoodOrderSystem::newFoodOrder() {
                     }
                 }
 
-                order.addItem(menu[choice - 1], quantity, specialInstruction, preference);
+                order.addItem(menu[choice - 1], quantity, specialInstruction, preference); // 确保传递4个参数
             }
         }
 
@@ -350,7 +350,7 @@ void FoodOrderSystem::reorder() {
 
             // 复制商品内容和特殊指示
             for (size_t i = 0; i < oldOrder.getItems().size(); ++i) {
-                newOrder.addItem(oldOrder.getItems()[i].first, oldOrder.getItems()[i].second, oldOrder.getSpecialInstructions()[i]);
+                newOrder.addItem(oldOrder.getItems()[i].first, oldOrder.getItems()[i].second, oldOrder.getSpecialInstructions()[i], oldOrder.getSelectedPreferences()[i]); // 确保传递4个参数
             }
 
             // 用户选择新的配送方式
@@ -411,7 +411,8 @@ void FoodOrderSystem::reorder() {
     }
 }
 
-void FoodOrderSystem::deleteOrder() {
+void FoodOrderSystem::deleteOrder() 
+{
     try {
         cout << BOLD << BLUE << "Select an order ID to delete: " << RESET;
         int orderId;
@@ -452,7 +453,7 @@ void FoodOrderSystem::modifyOrder() {
             cout << BOLD << BLUE << "Current order summary:\n" << RESET;
             order.displayOrderSummary();
 
-            cout << BOLD << BLUE << "Modify items (enter 0 to finish):\n" << RESET;
+            cout << BOLD << BLUE << "Modify or delete items (enter 0 to finish):\n" << RESET;
             vector<pair<Food*, int>> items = order.getItems();
             for (size_t i = 0; i < items.size(); ++i) {
                 cout << i + 1 << ". " << items[i].first->getName() << " - " << items[i].second << "\n";
@@ -466,17 +467,40 @@ void FoodOrderSystem::modifyOrder() {
                     throw invalid_argument("Invalid choice. Try again.\n");
                 }
                 else {
-                    int quantity;
-                    string specialInstruction;
+                    cout << BOLD << BLUE << "Do you want to delete this item? (1. Yes, 2. No): " << RESET;
+                    int deleteChoice;
+                    cin >> deleteChoice;
+                    if (deleteChoice == 1) {
+                        order.deleteItem(choice - 1);
+                    }
+                    else if (deleteChoice == 2) {
+                        int quantity;
+                        string specialInstruction, preference;
 
-                    cout << BOLD << BLUE << "Enter new quantity: " << RESET;
-                    cin >> quantity;
-                    cin.ignore(); // Ignore the newline character left in the input buffer
+                        cout << BOLD << BLUE << "Enter new quantity: " << RESET;
+                        cin >> quantity;
+                        cin.ignore(); // Ignore the newline character left in the input buffer
 
-                    cout << BOLD << BLUE << "Enter any new special instructions: " << RESET;
-                    getline(cin, specialInstruction);
+                        cout << BOLD << BLUE << "Enter any new special instructions: " << RESET;
+                        getline(cin, specialInstruction);
 
-                    order.modifyItem(choice - 1, quantity, specialInstruction);
+                        vector<string> preferences = items[choice - 1].first->getPreferences();
+                        if (!preferences.empty()) {
+                            cout << BOLD << BLUE << "Enter your new preference (enter 0 to skip): " << RESET;
+                            getline(cin, preference);
+                            if (preference != "0") {
+                                specialInstruction += " Preference: " + preference;
+                            }
+                            else {
+                                preference = ""; // No preference selected
+                            }
+                        }
+
+                        order.modifyItem(choice - 1, quantity, specialInstruction, preference); // 确保传递4个参数
+                    }
+                    else {
+                        throw invalid_argument("Invalid choice. Returning to modify menu.");
+                    }
                 }
             }
 
@@ -498,6 +522,7 @@ void FoodOrderSystem::modifyOrder() {
         cerr << RED << e.what() << RESET << endl;
     }
 }
+
 
 void FoodOrderSystem::displayRestaurants() const {
     cout << BOLD << GREEN << "=== Restaurants List ===" << RESET << endl;

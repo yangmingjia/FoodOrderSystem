@@ -92,12 +92,8 @@ void Order::displayOrderSummary() const {
     for (size_t i = 0; i < items.size(); ++i) {
         items[i].first->display();
         cout << "Quantity: " << items[i].second << "\n";
-        if (!specialInstructions[i].empty()) {
-            cout << "Special Instruction: " << specialInstructions[i] << "\n";
-        }
-        if (!selectedPreferences[i].empty()) {
-            cout << "Selected Preference: " << selectedPreferences[i] << "\n"; // 显示偏好
-        }
+        cout << "Special Instruction: " << (specialInstructions[i].empty() ? "None" : specialInstructions[i]) << "\n";
+        cout << "Selected Preference: " << (selectedPreferences[i].empty() ? "None" : selectedPreferences[i]) << "\n";
     }
     cout << "Subtotal: $" << totalPrice << "\n";
     if (discountPercentage > 0) {
@@ -124,12 +120,8 @@ void Order::displayConfirmation() const {
     for (size_t i = 0; i < items.size(); ++i) {
         items[i].first->display();
         cout << "Quantity: " << items[i].second << "\n";
-        if (!specialInstructions[i].empty()) {
-            cout << "Special Instruction: " << specialInstructions[i] << "\n";
-        }
-        if (!selectedPreferences[i].empty()) {
-            cout << "Selected Preference: " << selectedPreferences[i] << "\n"; // 显示偏好
-        }
+        cout << "Special Instruction: " << (specialInstructions[i].empty() ? "None" : specialInstructions[i]) << "\n";
+        cout << "Selected Preference: " << (selectedPreferences[i].empty() ? "None" : selectedPreferences[i]) << "\n";
     }
     cout << "Subtotal: $" << totalPrice << "\n";
     if (discountPercentage > 0) {
@@ -172,18 +164,8 @@ void Order::saveOrder(ofstream& ofs) const {
             << items[i].first->getPrice() << ","
             << items[i].first->getDescription() << ","
             << items[i].second;
-        if (!specialInstructions[i].empty()) {
-            ofs << "," << specialInstructions[i];
-        }
-        else {
-            ofs << ","; // Special instruction is empty
-        }
-        if (!selectedPreferences[i].empty()) {
-            ofs << "," << selectedPreferences[i];
-        }
-        else {
-            ofs << ","; // Preference is empty
-        }
+        ofs << "," << (specialInstructions[i].empty() ? "" : specialInstructions[i]);
+        ofs << "," << (selectedPreferences[i].empty() ? "" : selectedPreferences[i]);
         ofs << endl;
     }
     ofs << endl; // Use an empty line to separate orders

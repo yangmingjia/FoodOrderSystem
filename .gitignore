@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 # Order data
 orders.csv
+/FoodOrderSystem.sln
+/FoodOrderSystem.vcxproj
+/FoodOrderSystem.vcxproj.filters
