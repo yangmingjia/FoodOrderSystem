@@ -242,8 +242,8 @@ void FoodOrderSystem::newFoodOrder() {
             vector<string> preferences = menu[i]->getPreferences();
             if (!preferences.empty()) {
                 cout << BOLD << "Available preferences: " << RESET;
-                for (const auto& pref : preferences) {
-                    cout << pref << " ";
+                for (size_t j = 0; j < preferences.size(); ++j) {
+                    cout << j + 1 << ". " << preferences[j] << " ";
                 }
                 cout << endl;
             }
@@ -253,7 +253,7 @@ void FoodOrderSystem::newFoodOrder() {
             cin >> choice;
             if (choice == 0) break;
             if (choice < 1 || choice > menu.size()) {
-                throw invalid_argument("Invalid choice. Try again.\n");
+                cout << "Invalid choice. Try again.\n";
             }
             else {
                 int quantity;
@@ -271,9 +271,11 @@ void FoodOrderSystem::newFoodOrder() {
                     }
                     cout << endl;
                     cout << BOLD << BLUE << "Enter your preference (enter 0 to skip): " << RESET;
-                    getline(cin, preference);
-                    if (preference != "0") {
-                        specialInstruction += " Preference: " + preference;
+                    int prefChoice;
+                    cin >> prefChoice;
+                    cin.ignore();
+                    if (prefChoice > 0 && prefChoice <= preferences.size()) {
+                        preference = preferences[prefChoice - 1];
                     }
                     else {
                         preference = "";
@@ -316,7 +318,12 @@ void FoodOrderSystem::newFoodOrder() {
             cout << BOLD << BLUE << "Do you want to delete any item? (enter item number to delete, 0 to proceed): " << RESET;
             cin >> choice;
             if (choice == 0) break;
-            order.deleteItem(choice - 1);
+            if (choice < 1 || choice > order.getItems().size()) {
+                cout << RED << "Invalid choice. Try again.\n" << RESET;
+            }
+            else {
+                order.deleteItem(choice - 1);
+            }
         }
 
         cout << BOLD << BLUE << "Select payment method (1. Credit Card, 2. E-wallet, 3. Cash on Delivery): " << RESET;
@@ -488,7 +495,7 @@ void FoodOrderSystem::modifyOrder() {
             cout << BOLD << BLUE << "Modify or delete items (enter 0 to finish):\n" << RESET;
             vector<pair<Food*, int>> items = order.getItems();
             for (size_t i = 0; i < items.size(); ++i) {
-                cout << i + 1 << ". " << items[i].first->getName() << " - " << items[i].second << "\n";
+                cout << i + 1 << ". " << items[i].first->getName() << " - $ " << items[i].second << "\n";
             }
 
             int choice;
@@ -521,17 +528,23 @@ void FoodOrderSystem::modifyOrder() {
                             }
                             cout << endl;
                             cout << BOLD << BLUE << "Enter your new preference (enter 0 to skip): " << RESET;
-                            getline(cin, preference);
-                            if (preference != "0") {
-                                specialInstruction += " Preference: " + preference;
+                            int prefChoice;
+                            cin >> prefChoice;
+                            cin.ignore();
+                            if (prefChoice > 0 && prefChoice <= preferences.size()) {
+                                preference = preferences[prefChoice - 1];
                             }
                             else {
                                 preference = "";
                             }
                         }
 
-                        cout << BOLD << BLUE << "Enter any new special instructions: " << RESET;
+                        cout << BOLD << BLUE << "Enter any new special instructions (enter 0 to skip): " << RESET;
                         getline(cin, specialInstruction);
+                        if(specialInstruction == "0")
+						{
+							specialInstruction = "";
+						}
 
                         order.modifyItem(choice - 1, quantity, specialInstruction, preference);
                     }
