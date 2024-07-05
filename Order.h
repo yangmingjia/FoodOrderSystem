@@ -16,6 +16,7 @@ private:
     int orderId;
     vector<pair<Food*, int>> items;
     vector<string> specialInstructions;
+    vector<string> selectedPreferences; // 新增：存储用户选择的偏好
     double totalPrice;
     double discountPercentage;
     Delivery* deliveryOption;
@@ -26,9 +27,9 @@ private:
 public:
     Order();
 
-    void addItem(Food*, int, const string&);
+    void addItem(Food*, int, const string&, const string&); // 修改方法签名
     void deleteItem(int);
-    void modifyItem(int, int, const string&);
+    void modifyItem(int, int, const string&, const string&); // 修改方法签名
     void applyDiscount(double);
     void cancelOrder();
 
@@ -49,6 +50,7 @@ public:
     void setRiderDetails(const string&);
 
     vector<string> getSpecialInstructions() const;
+    vector<string> getSelectedPreferences() const; // 新增：获取选择的偏好
 
     void saveOrder(ofstream&) const;
     void setRestaurantName(const string&);
@@ -56,6 +58,5 @@ public:
     static vector<Order> loadOrders(const string&, const vector<Restaurant>&);
     static void saveOrders(const string&, const vector<Order>&);
 };
-
 
 #endif

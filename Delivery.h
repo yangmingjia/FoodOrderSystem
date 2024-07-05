@@ -10,9 +10,9 @@ using namespace std;
 class Delivery
 {
 protected:
-    string name;
-    int deliveryTime; // 送餐时间（分钟）
-    double fee; // 送餐费
+    string name; // Direct, Standard, Saver
+    int deliveryTime;
+    double fee;
 
 public:
     Delivery(const string&, int, double);

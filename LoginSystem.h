@@ -14,13 +14,14 @@ using namespace std;
 class LoginSystem 
 {
 private:
-    vector<User> users;
-    void loadUsers(const string&);
+    vector<User> users; // Stores all users
+    void loadUsers(const string&); // Loads users from file
 
 public:
     LoginSystem();
-    bool login(const string&, const string&);
-    void Login();
+
+    bool login(const string&, const string&); // Check if the username and password match
+    void Login(); // Prompts user to login
 };
 
 #endif

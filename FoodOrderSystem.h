@@ -21,22 +21,24 @@ class FoodOrderSystem
 private:
     vector<Restaurant> restaurants;
     vector<Order> orders;
-    vector<pair<string, string>> riders; // 保存配送员信息
+    vector<pair<string, string>> riders;
 
-    void loadRestaurants(const string&);
-    void loadMenu(const string&);
-    void loadRiders(const string&); // 加载配送员信息
+    void loadRestaurants(const string&); // Load restaurants from CSV file
+    void loadMenu(const string&); // Load menu from CSV file
+    void loadRiders(const string&); // Load riders from CSV file
 
 public:
     FoodOrderSystem();
-    void initializeRestaurants();
+    void initializeRestaurants(); // Initialize restaurants and their menus from CSV files
+    void loadOrders(const string&); // Load past orders from CSV file
+    void saveOrders(const string&); // Save all orders to the "orders.csv" file
+
     void newFoodOrder();
     void viewPastOrders();
     void reorder();
     void deleteOrder();
     void modifyOrder();
-    void loadOrders(const string&);
-    void saveOrders(const string&);
+    
     void displayRestaurants() const;
 };
 

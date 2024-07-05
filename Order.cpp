@@ -7,9 +7,10 @@ int Order::nextOrderId = 1;
 
 Order::Order() : totalPrice(0.0), discountPercentage(0.0), deliveryOption(nullptr), orderId(nextOrderId++) {}
 
-void Order::addItem(Food* item, int quantity, const string& instruction) {
+void Order::addItem(Food* item, int quantity, const string& instruction, const string& preference) {
     items.push_back({ item, quantity });
     specialInstructions.push_back(instruction);
+    selectedPreferences.push_back(preference); // 添加偏好
     totalPrice += item->getPrice() * quantity;
 }
 
@@ -18,17 +19,19 @@ void Order::deleteItem(int itemIndex) {
         totalPrice -= items[itemIndex].first->getPrice() * items[itemIndex].second;
         items.erase(items.begin() + itemIndex);
         specialInstructions.erase(specialInstructions.begin() + itemIndex);
+        selectedPreferences.erase(selectedPreferences.begin() + itemIndex); // 删除偏好
     }
     else {
         throw out_of_range("Invalid item index.");
     }
 }
 
-void Order::modifyItem(int itemIndex, int quantity, const string& instruction) {
+void Order::modifyItem(int itemIndex, int quantity, const string& instruction, const string& preference) {
     if (itemIndex >= 0 && itemIndex < items.size()) {
         totalPrice -= items[itemIndex].first->getPrice() * items[itemIndex].second;
         items[itemIndex].second = quantity;
         specialInstructions[itemIndex] = instruction;
+        selectedPreferences[itemIndex] = preference; // 修改偏好
         totalPrice += items[itemIndex].first->getPrice() * quantity;
     }
     else {
@@ -49,6 +52,7 @@ void Order::applyDiscount(double discountPercentage) {
 void Order::cancelOrder() {
     items.clear();
     specialInstructions.clear();
+    selectedPreferences.clear(); // 清除偏好
     totalPrice = 0.0;
     deliveryOption = nullptr;
     paymentMethod.clear();
@@ -91,6 +95,9 @@ void Order::displayOrderSummary() const {
         if (!specialInstructions[i].empty()) {
             cout << "Special Instruction: " << specialInstructions[i] << "\n";
         }
+        if (!selectedPreferences[i].empty()) {
+            cout << "Selected Preference: " << selectedPreferences[i] << "\n"; // 显示偏好
+        }
     }
     cout << "Subtotal: $" << totalPrice << "\n";
     if (discountPercentage > 0) {
@@ -120,6 +127,9 @@ void Order::displayConfirmation() const {
         if (!specialInstructions[i].empty()) {
             cout << "Special Instruction: " << specialInstructions[i] << "\n";
         }
+        if (!selectedPreferences[i].empty()) {
+            cout << "Selected Preference: " << selectedPreferences[i] << "\n"; // 显示偏好
+        }
     }
     cout << "Subtotal: $" << totalPrice << "\n";
     if (discountPercentage > 0) {
@@ -147,6 +157,10 @@ vector<string> Order::getSpecialInstructions() const {
     return specialInstructions;
 }
 
+vector<string> Order::getSelectedPreferences() const {
+    return selectedPreferences;
+}
+
 void Order::saveOrder(ofstream& ofs) const {
     ofs << orderId << ","
         << paymentMethod << ","
@@ -164,18 +178,22 @@ void Order::saveOrder(ofstream& ofs) const {
         else {
             ofs << ","; // Special instruction is empty
         }
+        if (!selectedPreferences[i].empty()) {
+            ofs << "," << selectedPreferences[i];
+        }
+        else {
+            ofs << ","; // Preference is empty
+        }
         ofs << endl;
     }
     ofs << endl; // Use an empty line to separate orders
 }
 
-void Order::setRestaurantName(const string& name) 
-{
+void Order::setRestaurantName(const string& name) {
     restaurantName = name;
 }
 
-vector<Order> Order::loadOrders(const string& filename, const vector<Restaurant>& restaurants) 
-{
+vector<Order> Order::loadOrders(const string& filename, const vector<Restaurant>& restaurants) {
     vector<Order> orders;
     ifstream ifs(filename);
     if (!ifs.is_open()) {
@@ -243,7 +261,7 @@ vector<Order> Order::loadOrders(const string& filename, const vector<Restaurant>
         // 读取后续行（食品项）
         while (getline(ifs, line) && !line.empty() && line.find(",") != string::npos) {
             stringstream itemStream(line);
-            string name, description, instruction;
+            string name, description, instruction, preference;
             double price;
             int quantity;
 
@@ -279,6 +297,14 @@ vector<Order> Order::loadOrders(const string& filename, const vector<Restaurant>
             }
             else {
                 instruction = "";
+            }
+
+            // 读取偏好，如果存在
+            if (getline(itemStream, preference, ',')) {
+                preference = preference;
+            }
+            else {
+                preference = "";
             }
 
             // 动态确定食品类型
@@ -320,7 +346,7 @@ vector<Order> Order::loadOrders(const string& filename, const vector<Restaurant>
             }
 
             // 添加食品项到订单中
-            order.addItem(food, quantity, instruction);
+            order.addItem(food, quantity, instruction, preference);
         }
         orders.push_back(order);
     }

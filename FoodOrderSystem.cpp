@@ -9,66 +9,95 @@
 
 using namespace std;
 
-FoodOrderSystem::FoodOrderSystem() {
+FoodOrderSystem::FoodOrderSystem() 
+{
     initializeRestaurants();
-    loadRiders("riders.csv"); // 加载配送员信息
-    loadOrders("orders.csv");  // 加载现有订单
+    loadRiders("riders.csv"); // Load riders from CSV file
+    loadOrders("orders.csv");  // Load past orders from CSV file
 }
 
-void FoodOrderSystem::initializeRestaurants() {
+// Initialize restaurants and their menus from CSV files
+void FoodOrderSystem::initializeRestaurants() 
+{
     try {
+        // Load restaurant and menu data from CSV files
         loadRestaurants("restaurants.csv");
         loadMenu("menu.csv");
     }
-    catch (const exception& e) {
+    catch (const exception& e) // Catch exceptions
+    {
+        // Print error message in red color
         cerr << RED << e.what() << RESET << endl;
     }
 }
 
-void FoodOrderSystem::loadRestaurants(const string& filename) {
+void FoodOrderSystem::loadRestaurants(const string& filename) 
+{
     ifstream ifs(filename);
-    if (!ifs.is_open()) {
+
+    // Check if file is open
+    if (!ifs.is_open()) 
+    {
         throw runtime_error("Could not open file for reading: " + filename);
     }
 
     string line;
-    getline(ifs, line); // 跳过标题行
-    while (getline(ifs, line)) {
-        stringstream ss(line);
-        string restaurantName, type;
-        getline(ss, restaurantName, ',');
-        getline(ss, type, ',');
+    getline(ifs, line); // Skip the header line
 
+    while (getline(ifs, line)) // Read each line from the file
+    {
+        stringstream restaurantData(line);
+        string restaurantName, type;
+
+        // Read restaurant name and type from the line and store in the restaurants vector
+        getline(restaurantData, restaurantName, ',');
+        getline(restaurantData, type, ',');
         restaurants.push_back(Restaurant(restaurantName, type));
     }
-    ifs.close(); // 确保文件关闭
+
+    ifs.close(); // Close the file
 }
 
-void FoodOrderSystem::loadMenu(const string& filename) {
+void FoodOrderSystem::loadMenu(const string& filename) 
+{
     ifstream ifs(filename);
-    if (!ifs.is_open()) {
+
+    // Check if file is open
+    if (!ifs.is_open()) 
+    {
         throw runtime_error("Could not open file for reading: " + filename);
     }
 
     string line;
-    getline(ifs, line); // 跳过标题行
-    while (getline(ifs, line)) {
-        stringstream ss(line);
+    getline(ifs, line); // Skip the header line
+
+    while (getline(ifs, line)) // Read each line from the file
+    {
+        stringstream menuData(line);
         string restaurantName, foodName, priceStr, description;
-        getline(ss, restaurantName, ',');
-        getline(ss, foodName, ',');
-        getline(ss, priceStr, ',');
-        getline(ss, description, ',');
+
+        // Read restaurant details from the line
+        getline(menuData, restaurantName, ',');
+        getline(menuData, foodName, ',');
+        getline(menuData, priceStr, ',');
+        getline(menuData, description, ',');
 
         double price = stod(priceStr);
 
-        auto it = find_if(restaurants.begin(), restaurants.end(),
-            [&restaurantName](const Restaurant& restaurant) {
-                return restaurant.getName() == restaurantName;
-            });
+        Restaurant* restaurantPtr = nullptr;
 
-        if (it != restaurants.end()) {
-            Restaurant& restaurant = *it;
+        for(auto& const r: restaurants)
+		{
+			if(r.getName() == restaurantName)
+			{
+				restaurantPtr = &r;
+				break;
+			}
+		}
+
+        if (restaurantPtr) 
+        {
+            Restaurant& restaurant = *restaurantPtr;
             string type = restaurant.getType();
             Food* food = nullptr;
 
@@ -112,60 +141,78 @@ void FoodOrderSystem::loadMenu(const string& filename) {
             throw runtime_error("Restaurant not found: " + restaurantName);
         }
     }
-    ifs.close(); // 确保文件关闭
+    ifs.close(); // Close the file
 }
 
-void FoodOrderSystem::loadOrders(const string& filename) {
-    orders = Order::loadOrders(filename, restaurants); // 传递 restaurants 参数
+// Load past orders from CSV file
+void FoodOrderSystem::loadOrders(const string& filename)
+{
+    orders = Order::loadOrders(filename, restaurants); // Pass the restaurants vector to loadOrders function
 }
 
-void FoodOrderSystem::saveOrders(const string& filename) {
+// Save all orders to the "orders.csv" file
+void FoodOrderSystem::saveOrders(const string& filename)
+{
     Order::saveOrders(filename, orders);
 }
 
-void FoodOrderSystem::loadRiders(const string& filename) {
+// Load riders from CSV file
+void FoodOrderSystem::loadRiders(const string& filename) 
+{
     ifstream ifs(filename);
-    if (!ifs.is_open()) {
+
+    // Check if file is open
+    if (!ifs.is_open()) 
+    {
         throw runtime_error("Could not open file for reading: " + filename);
     }
 
     string line;
-    getline(ifs, line); // 跳过标题行
-    while (getline(ifs, line)) {
-        stringstream ss(line);
-        string name, phone;
-        getline(ss, name, ',');
-        getline(ss, phone, ',');
+    getline(ifs, line); // Skip the header line
 
+    while (getline(ifs, line)) // Read each line from the file
+    {
+        stringstream riderData(line);
+        string name, phone;
+
+        // Read rider details from the line and store in the riders vector and store in the riders vector
+        getline(riderData, name, ',');
+        getline(riderData, phone, ',');
         riders.push_back(make_pair(name, phone));
     }
-    ifs.close(); // 确保文件关闭
+    ifs.close(); // Close the file
 }
 
 void FoodOrderSystem::newFoodOrder() {
     try {
-        cout << BOLD << BLUE << "Select a restaurant:\n" << RESET;
+        system("cls");
+        cout << BOLD << BLUE << "=== New Food Order ===" << RESET << endl;
         displayRestaurants();
+
+        cout << "Select a restaurant:";
         int choice;
         cin >> choice;
         if (choice < 1 || choice > restaurants.size()) {
-            throw invalid_argument("Invalid choice. Returning to main menu.\n");
+            throw invalid_argument("Invalid choice. Returning to main menu.");
         }
 
         Restaurant& selectedRestaurant = restaurants[choice - 1];
         Order order;
-        order.setRestaurantName(selectedRestaurant.getName()); // 存储餐厅名称
-        cout << BOLD << BLUE << "Select food items (enter 0 to finish):\n" << RESET;
+        order.setRestaurantName(selectedRestaurant.getName());
+
+        system("cls");
+        cout << "Select food items (enter 0 to finish):" << RESET << endl;
+
         vector<Food*> menu = selectedRestaurant.getMenu();
-        for (size_t i = 0; i < menu.size(); ++i) {
-            cout << i + 1 << ". " << menu[i]->getName() << " - " << menu[i]->getPrice() << "\n";
+        for (int i = 0; i < menu.size(); i++) {
+            cout << i + 1 << ". " << menu[i]->getName() << " - $" << menu[i]->getPrice() << endl;
             vector<string> preferences = menu[i]->getPreferences();
             if (!preferences.empty()) {
                 cout << BOLD << "Available preferences: " << RESET;
                 for (const auto& pref : preferences) {
                     cout << pref << " ";
                 }
-                cout << "\n";
+                cout << endl;
             }
         }
 
@@ -181,23 +228,27 @@ void FoodOrderSystem::newFoodOrder() {
 
                 cout << BOLD << BLUE << "Enter quantity: " << RESET;
                 cin >> quantity;
-                cin.ignore(); // Ignore the newline character left in the input buffer
+                cin.ignore();
 
                 cout << BOLD << BLUE << "Enter any special instructions: " << RESET;
                 getline(cin, specialInstruction);
 
                 vector<string> preferences = menu[choice - 1]->getPreferences();
                 if (!preferences.empty()) {
-                    cout << BOLD << BLUE << "Enter your preference: " << RESET;
+                    cout << BOLD << BLUE << "Enter your preference (enter 0 to skip): " << RESET;
                     getline(cin, preference);
-                    specialInstruction += " Preference: " + preference;
+                    if (preference != "0") {
+                        specialInstruction += " Preference: " + preference;
+                    }
+                    else {
+                        preference = ""; // No preference selected
+                    }
                 }
 
-                order.addItem(menu[choice - 1], quantity, specialInstruction);
+                order.addItem(menu[choice - 1], quantity, specialInstruction, preference);
             }
         }
 
-        // 添加折扣
         double discount;
         cout << BOLD << BLUE << "Enter discount percentage (0-100): " << RESET;
         cin >> discount;
@@ -222,8 +273,19 @@ void FoodOrderSystem::newFoodOrder() {
 
         order.setDeliveryOption(deliveryOptions[choice - 1]);
 
-        // 显示订单摘要
-        order.displayOrderSummary();
+        // 循环允许用户删除订单项
+        while (true) {
+            order.displayOrderSummary();
+            cout << BOLD << BLUE << "Do you want to delete any item? (enter item number to delete, 0 to proceed): " << RESET;
+            cin >> choice;
+            if (choice == 0) break;
+            if (choice < 1 || choice > order.getItems().size()) {
+                cout << RED << "Invalid choice. Try again.\n" << RESET;
+            }
+            else {
+                order.deleteItem(choice - 1);
+            }
+        }
 
         cout << BOLD << BLUE << "Select payment method (1. Credit Card, 2. E-wallet, 3. Cash on Delivery): " << RESET;
         cin >> choice;
@@ -240,7 +302,6 @@ void FoodOrderSystem::newFoodOrder() {
             throw invalid_argument("Invalid payment method selected.\n");
         }
 
-        // 随机分配配送员
         if (riders.empty()) {
             throw runtime_error("No riders available.");
         }
@@ -249,11 +310,10 @@ void FoodOrderSystem::newFoodOrder() {
         string riderDetails = "Rider: " + riders[riderIndex].first + ", Phone: " + riders[riderIndex].second;
         order.setRiderDetails(riderDetails);
 
-        // 显示订单确认
         order.displayConfirmation();
 
         orders.push_back(order);
-        saveOrders("orders.csv");  // Save all orders to the "orders.csv" file
+        saveOrders("orders.csv");
     }
     catch (const exception& e) {
         cerr << RED << e.what() << RESET << endl;
@@ -440,20 +500,23 @@ void FoodOrderSystem::modifyOrder() {
 }
 
 void FoodOrderSystem::displayRestaurants() const {
-    cout << BOLD << BLUE << "Restaurants:\n" << RESET;
-    for (size_t i = 0; i < restaurants.size(); ++i) {
-        cout << i + 1 << ". " << restaurants[i].getName() << "\n";
+    cout << BOLD << GREEN << "=== Restaurants List ===" << RESET << endl;
+    for (size_t i = 0; i < restaurants.size(); ++i) 
+    {
+        cout << i + 1 << ". " << restaurants[i].getName() << endl;
     }
+    cout<< BOLD  << GREEN << "========================" << RESET << endl <<endl;
 }
 
-void displayMenu() {
-    cout << BOLD << BLUE << "Main Menu:\n" << RESET;
-    cout << BOLD << "1. New Food Order" << RESET << "\n";
-    cout << BOLD << "2. View Past Orders" << RESET << "\n";
-    cout << BOLD << "3. Display Restaurants" << RESET << "\n";
-    cout << BOLD << "4. Reorder" << RESET << "\n";
-    cout << BOLD << "5. Delete Order" << RESET << "\n";
-    cout << BOLD << "6. Modify Order" << RESET << "\n";
-    cout << BOLD << "7. Exit" << RESET << "\n";
+void displayMenu() 
+{
+    cout << BOLD << BLUE << "=== Food Order System Menu ===" << RESET << endl;
+    cout << BOLD << "1. New Food Order" << RESET << endl;
+    cout << BOLD << "2. View Past Orders" << RESET << endl;
+    cout << BOLD << "3. Display Restaurants" << RESET << endl;
+    cout << BOLD << "4. Reorder" << RESET << endl;
+    cout << BOLD << "5. Delete Order" << RESET << endl;
+    cout << BOLD << "6. Modify Order" << RESET << endl;
+    cout << BOLD << "7. Exit" << RESET << endl;
     cout << BOLD << BLUE << "Enter your choice: " << RESET;
 }
