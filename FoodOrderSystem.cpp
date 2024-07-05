@@ -1,13 +1,4 @@
 #include "FoodOrderSystem.h"
-#include "Color.h"
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
-#include <cstdlib>
-#include <ctime>
-
-using namespace std;
 
 FoodOrderSystem::FoodOrderSystem() 
 {
