@@ -77,7 +77,7 @@ void FoodOrderSystem::loadMenu(const string& filename)
 
         Restaurant* restaurantPtr = nullptr;
 
-        for(auto& const r: restaurants)
+        for(auto& r: restaurants)
 		{
 			if(r.getName() == restaurantName)
 			{
@@ -236,7 +236,7 @@ void FoodOrderSystem::newFoodOrder() {
                     }
                 }
 
-                order.addItem(menu[choice - 1], quantity, specialInstruction, preference); // È·±£´«µİ4¸ö²ÎÊı
+                order.addItem(menu[choice - 1], quantity, specialInstruction, preference); // ç¡®ä¿ä¼ é€’4ä¸ªå‚æ•°
             }
         }
 
@@ -264,7 +264,7 @@ void FoodOrderSystem::newFoodOrder() {
 
         order.setDeliveryOption(deliveryOptions[choice - 1]);
 
-        // Ñ­»·ÔÊĞíÓÃ»§É¾³ı¶©µ¥Ïî
+        // å¾ªç¯å…è®¸ç”¨æˆ·åˆ é™¤è®¢å•é¡¹
         while (true) {
             order.displayOrderSummary();
             cout << BOLD << BLUE << "Do you want to delete any item? (enter item number to delete, 0 to proceed): " << RESET;
@@ -337,14 +337,14 @@ void FoodOrderSystem::reorder() {
 
         if (it != orders.end()) {
             Order oldOrder = *it;
-            Order newOrder;  // ´´½¨Ò»¸öĞÂµÄ¶©µ¥
+            Order newOrder;  // åˆ›å»ºä¸€ä¸ªæ–°çš„è®¢å•
 
-            // ¸´ÖÆÉÌÆ·ÄÚÈİºÍÌØÊâÖ¸Ê¾
+            // å¤åˆ¶å•†å“å†…å®¹å’Œç‰¹æ®ŠæŒ‡ç¤º
             for (size_t i = 0; i < oldOrder.getItems().size(); ++i) {
-                newOrder.addItem(oldOrder.getItems()[i].first, oldOrder.getItems()[i].second, oldOrder.getSpecialInstructions()[i], oldOrder.getSelectedPreferences()[i]); // È·±£´«µİ4¸ö²ÎÊı
+                newOrder.addItem(oldOrder.getItems()[i].first, oldOrder.getItems()[i].second, oldOrder.getSpecialInstructions()[i], oldOrder.getSelectedPreferences()[i]); // ç¡®ä¿ä¼ é€’4ä¸ªå‚æ•°
             }
 
-            // ÓÃ»§Ñ¡ÔñĞÂµÄÅäËÍ·½Ê½
+            // ç”¨æˆ·é€‰æ‹©æ–°çš„é…é€æ–¹å¼
             vector<Delivery*> deliveryOptions;
             deliveryOptions.push_back(new DirectDelivery("Direct Delivery", 30, 5.0));
             deliveryOptions.push_back(new StandardDelivery("Standard Delivery", 45, 3.0));
@@ -362,7 +362,7 @@ void FoodOrderSystem::reorder() {
 
             newOrder.setDeliveryOption(deliveryOptions[choice - 1]);
 
-            // ÓÃ»§Ñ¡ÔñĞÂµÄ¸¶¿î·½Ê½
+            // ç”¨æˆ·é€‰æ‹©æ–°çš„ä»˜æ¬¾æ–¹å¼
             cout << BOLD << BLUE << "Select payment method (1. Credit Card, 2. E-wallet, 3. Cash on Delivery): " << RESET;
             cin >> choice;
             if (choice == 1) {
@@ -378,7 +378,7 @@ void FoodOrderSystem::reorder() {
                 throw invalid_argument("Invalid payment method selected.\n");
             }
 
-            // Ëæ»ú·ÖÅäÅäËÍÔ±
+            // éšæœºåˆ†é…é…é€å‘˜
             if (riders.empty()) {
                 throw runtime_error("No riders available.");
             }
@@ -387,11 +387,11 @@ void FoodOrderSystem::reorder() {
             string riderDetails = "Rider: " + riders[riderIndex].first + ", Phone: " + riders[riderIndex].second;
             newOrder.setRiderDetails(riderDetails);
 
-            // ÏÔÊ¾¶©µ¥È·ÈÏ
+            // æ˜¾ç¤ºè®¢å•ç¡®è®¤
             newOrder.displayConfirmation();
 
             orders.push_back(newOrder);
-            saveOrders("orders.csv");  // ±£´æËùÓĞ¶©µ¥µ½ "orders.csv" ÎÄ¼şÖĞ
+            saveOrders("orders.csv");  // ä¿å­˜æ‰€æœ‰è®¢å•åˆ° "orders.csv" æ–‡ä»¶ä¸­
         }
         else {
             throw invalid_argument("Order ID not found.");
@@ -487,7 +487,7 @@ void FoodOrderSystem::modifyOrder() {
                             }
                         }
 
-                        order.modifyItem(choice - 1, quantity, specialInstruction, preference); // È·±£´«µİ4¸ö²ÎÊı
+                        order.modifyItem(choice - 1, quantity, specialInstruction, preference); // ç¡®ä¿ä¼ é€’4ä¸ªå‚æ•°
                     }
                     else {
                         throw invalid_argument("Invalid choice. Returning to modify menu.");
