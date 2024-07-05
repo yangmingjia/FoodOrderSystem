@@ -7,13 +7,12 @@ using namespace std;
 
 int main()
 {
-    try
-    {
+    try {
         LoginSystem login;
         FoodOrderSystem foodOrderSystem;
 
         int choice;
-        login.Login();
+        // login.Login();
         while (true)
         {
             displayMenu();

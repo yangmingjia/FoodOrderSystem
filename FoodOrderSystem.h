@@ -37,7 +37,7 @@ public:
     void saveOrders(const string&); // Save all orders to the "orders.csv" file
     void loadMenuPreference(const string& filename); // Load menu preferences from CSV file
 
-    void newFoodOrder();
+    void newFoodOrder(); 
     void viewPastOrders();
     void reorder();
     void deleteOrder();
