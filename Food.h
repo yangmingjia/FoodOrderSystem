@@ -25,6 +25,7 @@ public:
     virtual string getDescription() const;
     virtual vector<string> getPreferences() const;
 
+    void setPreferences(const vector<string>&);
     virtual void display() const = 0;
     virtual void save(ofstream& ofs) const = 0;
 };

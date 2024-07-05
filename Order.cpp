@@ -10,7 +10,7 @@ Order::Order() : totalPrice(0.0), discountPercentage(0.0), deliveryOption(nullpt
 void Order::addItem(Food* item, int quantity, const string& instruction, const string& preference) {
     items.push_back({ item, quantity });
     specialInstructions.push_back(instruction);
-    selectedPreferences.push_back(preference); // 添加偏好
+    selectedPreferences.push_back(preference);
     totalPrice += item->getPrice() * quantity;
 }
 
@@ -19,7 +19,7 @@ void Order::deleteItem(int itemIndex) {
         totalPrice -= items[itemIndex].first->getPrice() * items[itemIndex].second;
         items.erase(items.begin() + itemIndex);
         specialInstructions.erase(specialInstructions.begin() + itemIndex);
-        selectedPreferences.erase(selectedPreferences.begin() + itemIndex); // 删除偏好
+        selectedPreferences.erase(selectedPreferences.begin() + itemIndex);
     }
     else {
         throw out_of_range("Invalid item index.");
@@ -31,7 +31,7 @@ void Order::modifyItem(int itemIndex, int quantity, const string& instruction, c
         totalPrice -= items[itemIndex].first->getPrice() * items[itemIndex].second;
         items[itemIndex].second = quantity;
         specialInstructions[itemIndex] = instruction;
-        selectedPreferences[itemIndex] = preference; // 修改偏好
+        selectedPreferences[itemIndex] = preference;
         totalPrice += items[itemIndex].first->getPrice() * quantity;
     }
     else {

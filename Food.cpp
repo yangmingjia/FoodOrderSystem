@@ -23,6 +23,11 @@ vector<string> Food::getPreferences() const
     return preferences;
 }
 
+void Food::setPreferences(const vector<string>& prefs)
+{
+    preferences = prefs;
+}
+
 ChineseFood::ChineseFood(const string& name, double price, const string& description, const vector<string>& prefs)
     : Food(name, price, description, prefs) {}
 

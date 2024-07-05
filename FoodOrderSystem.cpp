@@ -14,6 +14,7 @@ void FoodOrderSystem::initializeRestaurants()
         // Load restaurant and menu data from CSV files
         loadRestaurants("restaurants.csv");
         loadMenu("menu.csv");
+        loadMenuPreference("preference.csv");
     }
     catch (const exception& e) // Catch exceptions
     {
@@ -135,6 +136,47 @@ void FoodOrderSystem::loadMenu(const string& filename)
     ifs.close(); // Close the file
 }
 
+void FoodOrderSystem::loadMenuPreference(const string& filename) {
+    ifstream menuPreferenceData(filename);
+    if (!menuPreferenceData.is_open()) {
+        throw runtime_error("Could not open file for reading: " + filename);
+    }
+
+    string line;
+    getline(menuPreferenceData, line); // Skip the header line
+
+    while (getline(menuPreferenceData, line)) 
+    {
+        istringstream ss(line);
+        string name;
+        getline(ss, name, ',');
+
+        string pref;
+        vector<string> preferences;
+        while (getline(ss, pref, ',')) {
+            preferences.push_back(pref);
+        }
+         
+        bool foodFound = false;
+        // 找到对应的菜品并设置偏好
+        for (Restaurant& restaurant : restaurants) {
+            for (Food* food : restaurant.getMenu()) {
+                if (food->getName() == name) {
+                    food->setPreferences(preferences);
+                    foodFound = true;
+                    break;
+                }
+            }
+            if (foodFound) break;
+        }
+
+        if (!foodFound) {
+            throw runtime_error("Food item \"" + name + "\" not found in the restaurant menu.");
+        }
+    }
+
+    menuPreferenceData.close();
+}
 // Load past orders from CSV file
 void FoodOrderSystem::loadOrders(const string& filename)
 {
@@ -221,22 +263,27 @@ void FoodOrderSystem::newFoodOrder() {
                 cin >> quantity;
                 cin.ignore();
 
-                cout << BOLD << BLUE << "Enter any special instructions: " << RESET;
-                getline(cin, specialInstruction);
-
                 vector<string> preferences = menu[choice - 1]->getPreferences();
                 if (!preferences.empty()) {
+                    cout << BOLD << BLUE << "Available preferences: " << RESET;
+                    for (size_t i = 0; i < preferences.size(); ++i) {
+                        cout << i + 1 << ". " << preferences[i] << " ";
+                    }
+                    cout << endl;
                     cout << BOLD << BLUE << "Enter your preference (enter 0 to skip): " << RESET;
                     getline(cin, preference);
                     if (preference != "0") {
                         specialInstruction += " Preference: " + preference;
                     }
                     else {
-                        preference = ""; // No preference selected
+                        preference = "";
                     }
                 }
 
-                order.addItem(menu[choice - 1], quantity, specialInstruction, preference); // 确保传递4个参数
+                cout << BOLD << BLUE << "Enter any special instructions: " << RESET;
+                getline(cin, specialInstruction);
+
+                order.addItem(menu[choice - 1], quantity, specialInstruction, preference);
             }
         }
 
@@ -264,18 +311,12 @@ void FoodOrderSystem::newFoodOrder() {
 
         order.setDeliveryOption(deliveryOptions[choice - 1]);
 
-        // 循环允许用户删除订单项
         while (true) {
             order.displayOrderSummary();
             cout << BOLD << BLUE << "Do you want to delete any item? (enter item number to delete, 0 to proceed): " << RESET;
             cin >> choice;
             if (choice == 0) break;
-            if (choice < 1 || choice > order.getItems().size()) {
-                cout << RED << "Invalid choice. Try again.\n" << RESET;
-            }
-            else {
-                order.deleteItem(choice - 1);
-            }
+            order.deleteItem(choice - 1);
         }
 
         cout << BOLD << BLUE << "Select payment method (1. Credit Card, 2. E-wallet, 3. Cash on Delivery): " << RESET;
@@ -341,7 +382,7 @@ void FoodOrderSystem::reorder() {
 
             // 复制商品内容和特殊指示
             for (size_t i = 0; i < oldOrder.getItems().size(); ++i) {
-                newOrder.addItem(oldOrder.getItems()[i].first, oldOrder.getItems()[i].second, oldOrder.getSpecialInstructions()[i], oldOrder.getSelectedPreferences()[i]); // 确保传递4个参数
+                newOrder.addItem(oldOrder.getItems()[i].first, oldOrder.getItems()[i].second, oldOrder.getSpecialInstructions()[i], oldOrder.getSelectedPreferences()[i]);
             }
 
             // 用户选择新的配送方式
@@ -455,7 +496,7 @@ void FoodOrderSystem::modifyOrder() {
                 cin >> choice;
                 if (choice == 0) break;
                 if (choice < 1 || choice > items.size()) {
-                    throw invalid_argument("Invalid choice. Try again.\n");
+                    cout << "Invalid choice. Try again.\n";
                 }
                 else {
                     cout << BOLD << BLUE << "Do you want to delete this item? (1. Yes, 2. No): " << RESET;
@@ -470,27 +511,32 @@ void FoodOrderSystem::modifyOrder() {
 
                         cout << BOLD << BLUE << "Enter new quantity: " << RESET;
                         cin >> quantity;
-                        cin.ignore(); // Ignore the newline character left in the input buffer
-
-                        cout << BOLD << BLUE << "Enter any new special instructions: " << RESET;
-                        getline(cin, specialInstruction);
+                        cin.ignore();
 
                         vector<string> preferences = items[choice - 1].first->getPreferences();
                         if (!preferences.empty()) {
+                            cout << BOLD << BLUE << "Available preferences: " << RESET;
+                            for (size_t i = 0; i < preferences.size(); ++i) {
+                                cout << i + 1 << ". " << preferences[i] << " ";
+                            }
+                            cout << endl;
                             cout << BOLD << BLUE << "Enter your new preference (enter 0 to skip): " << RESET;
                             getline(cin, preference);
                             if (preference != "0") {
                                 specialInstruction += " Preference: " + preference;
                             }
                             else {
-                                preference = ""; // No preference selected
+                                preference = "";
                             }
                         }
 
-                        order.modifyItem(choice - 1, quantity, specialInstruction, preference); // 确保传递4个参数
+                        cout << BOLD << BLUE << "Enter any new special instructions: " << RESET;
+                        getline(cin, specialInstruction);
+
+                        order.modifyItem(choice - 1, quantity, specialInstruction, preference);
                     }
                     else {
-                        throw invalid_argument("Invalid choice. Returning to modify menu.");
+                        cout << "Invalid choice. Returning to modify menu.\n";
                     }
                 }
             }
@@ -506,14 +552,13 @@ void FoodOrderSystem::modifyOrder() {
             saveOrders("orders.csv");
         }
         else {
-            throw invalid_argument("Order ID not found.");
+            cout << "Order ID not found.\n";
         }
     }
     catch (const exception& e) {
         cerr << RED << e.what() << RESET << endl;
     }
 }
-
 
 void FoodOrderSystem::displayRestaurants() const {
     cout << BOLD << GREEN << "=== Restaurants List ===" << RESET << endl;
