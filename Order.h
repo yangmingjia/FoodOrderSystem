@@ -4,17 +4,21 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
 #include "Food.h"
 #include "Delivery.h"
 #include "Restaurant.h"
 
 using namespace std;
 
-class Order {
+class Order 
+{
 private:
     static int nextOrderId;
     int orderId;
-    vector<pair<Food*, int>> items;
+    vector<pair<Food*, int>> items; // pair<Food*, quantity>
     vector<string> specialInstructions;
     vector<string> selectedPreferences;
     double totalPrice;
@@ -27,13 +31,14 @@ private:
 public:
     Order();
 
-    void addItem(Food*, int, const string&, const string&);
-    void deleteItem(int itemIndex); // 修改方法签名
-    void modifyItem(int, int, const string&, const string&);
+    void addItem(Food*, int, const string&, const string&); // Add item to the order
+    void deleteItem(int itemIndex); // Delete item from order
+    void modifyItem(int, int, const string&, const string&); // Modify order item
     void applyDiscount(double);
-    void cancelOrder();
 
-    vector<pair<Food*, int>> getItems() const;
+    vector<pair<Food*, int>> getItems() const; 
+
+    void setTotalPrice(double);
     double getTotalPrice() const;
 
     void setDeliveryOption(Delivery*);
@@ -44,8 +49,10 @@ public:
 
     int getOrderId() const;
 
-    void displayOrderSummary() const;
-    void displayConfirmation() const;
+    double getDiscountPercentage() const;
+
+    void displayOrderSummary(bool Inorder) const; // Display order summary
+    void displayConfirmation() const; // Display order confirmation
 
     void setRiderDetails(const string&);
 

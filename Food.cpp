@@ -28,6 +28,7 @@ void Food::setPreferences(const vector<string>& prefs)
     preferences = prefs;
 }
 
+// Chinese food
 ChineseFood::ChineseFood(const string& name, double price, const string& description, const vector<string>& prefs)
     : Food(name, price, description, prefs) {}
 
@@ -79,6 +80,7 @@ void CantoneseCuisine::save(ofstream& ofs) const
     ofs << "Cantonese Cuisine," << name << "," << price << "," << description << endl;
 }
 
+// Western food
 WesternFood::WesternFood(const string& name, double price, const string& description, const vector<string>& prefs)
     : Food(name, price, description, prefs) {}
 
@@ -130,10 +132,12 @@ void FrenchCuisine::save(ofstream& ofs) const
     ofs << "French Cuisine," << name << "," << price << "," << description << endl;
 }
 
+// Arabic food
 ArabicFood::ArabicFood(const string& name, double price, const string& description, const vector<string>& prefs)
     : Food(name, price, description, prefs) {}
 
-void ArabicFood::display() const {
+void ArabicFood::display() const 
+{
     cout << "Arabic Food: " << name << ", Price: " << price << ", Description: " << description << endl;
     for (const auto& pref : preferences)
     {
@@ -141,14 +145,16 @@ void ArabicFood::display() const {
     }
 }
 
-void ArabicFood::save(ofstream& ofs) const {
+void ArabicFood::save(ofstream& ofs) const 
+{
     ofs << "Arabic Food," << name << "," << price << "," << description << endl;
 }
 
 LebaneseCuisine::LebaneseCuisine(const string& name, double price, const string& description, const vector<string>& prefs)
     : ArabicFood(name, price, description, prefs) {}
 
-void LebaneseCuisine::display() const {
+void LebaneseCuisine::display() const 
+{
     cout << "Lebanese Cuisine: " << name << ", Price: " << price << ", Description: " << description << endl;
     for (const auto& pref : preferences)
     {
@@ -156,14 +162,16 @@ void LebaneseCuisine::display() const {
     }
 }
 
-void LebaneseCuisine::save(ofstream& ofs) const {
+void LebaneseCuisine::save(ofstream& ofs) const 
+{
     ofs << "Lebanese Cuisine," << name << "," << price << "," << description << endl;
 }
 
 MoroccanCuisine::MoroccanCuisine(const string& name, double price, const string& description, const vector<string>& prefs)
     : ArabicFood(name, price, description, prefs) {}
 
-void MoroccanCuisine::display() const {
+void MoroccanCuisine::display() const 
+{
     cout << "Moroccan Cuisine: " << name << ", Price: " << price << ", Description: " << description << endl;
     for (const auto& pref : preferences)
     {
@@ -171,7 +179,8 @@ void MoroccanCuisine::display() const {
     }
 }
 
-void MoroccanCuisine::save(ofstream& ofs) const {
+void MoroccanCuisine::save(ofstream& ofs) const 
+{
     ofs << "Moroccan Cuisine," << name << "," << price << "," << description << endl;
 }
 
@@ -179,7 +188,8 @@ void MoroccanCuisine::save(ofstream& ofs) const {
 MexicanFood::MexicanFood(const string& name, double price, const string& description, const vector<string>& prefs)
     : Food(name, price, description, prefs) {}
 
-void MexicanFood::display() const {
+void MexicanFood::display() const 
+{
     cout << "Mexican Food: " << name << ", Price: " << price << ", Description: " << description << endl;
     for (const auto& pref : preferences)
     {
@@ -187,14 +197,16 @@ void MexicanFood::display() const {
     }
 }
 
-void MexicanFood::save(ofstream& ofs) const {
+void MexicanFood::save(ofstream& ofs) const 
+{
     ofs << "Mexican Food," << name << "," << price << "," << description << endl;
 }
 
 TexMexCuisine::TexMexCuisine(const string& name, double price, const string& description, const vector<string>& prefs)
     : MexicanFood(name, price, description, prefs) {}
 
-void TexMexCuisine::display() const {
+void TexMexCuisine::display() const 
+{
     cout << "Tex-Mex Cuisine: " << name << ", Price: " << price << ", Description: " << description << endl;
     for (const auto& pref : preferences)
     {
@@ -202,14 +214,16 @@ void TexMexCuisine::display() const {
     }
 }
 
-void TexMexCuisine::save(ofstream& ofs) const {
+void TexMexCuisine::save(ofstream& ofs) const 
+{
     ofs << "Tex-Mex Cuisine," << name << "," << price << "," << description << endl;
 }
 
 TraditionalMexicanCuisine::TraditionalMexicanCuisine(const string& name, double price, const string& description, const vector<string>& prefs)
     : MexicanFood(name, price, description, prefs) {}
 
-void TraditionalMexicanCuisine::display() const {
+void TraditionalMexicanCuisine::display() const 
+{
     cout << "Traditional Mexican Cuisine: " << name << ", Price: " << price << ", Description: " << description << endl;
     for (const auto& pref : preferences)
     {
@@ -217,7 +231,8 @@ void TraditionalMexicanCuisine::display() const {
     }
 }
 
-void TraditionalMexicanCuisine::save(ofstream& ofs) const {
+void TraditionalMexicanCuisine::save(ofstream& ofs) const 
+{
     ofs << "Traditional Mexican Cuisine," << name << "," << price << "," << description << endl;
 }
 
@@ -225,7 +240,8 @@ void TraditionalMexicanCuisine::save(ofstream& ofs) const {
 JapaneseFood::JapaneseFood(const string& name, double price, const string& description, const vector<string>& prefs)
     : Food(name, price, description, prefs) {}
 
-void JapaneseFood::display() const {
+void JapaneseFood::display() const 
+{
     cout << "Japanese Food: " << name << ", Price: " << price << ", Description: " << description << endl;
     for (const auto& pref : preferences)
     {
@@ -233,14 +249,16 @@ void JapaneseFood::display() const {
     }
 }
 
-void JapaneseFood::save(ofstream& ofs) const {
+void JapaneseFood::save(ofstream& ofs) const 
+{
     ofs << "Japanese Food," << name << "," << price << "," << description << endl;
 }
 
 SushiCuisine::SushiCuisine(const string& name, double price, const string& description, const vector<string>& prefs)
     : JapaneseFood(name, price, description, prefs) {}
 
-void SushiCuisine::display() const {
+void SushiCuisine::display() const 
+{
     cout << "Sushi Cuisine: " << name << ", Price: " << price << ", Description: " << description << endl;
     for (const auto& pref : preferences)
     {
@@ -248,14 +266,16 @@ void SushiCuisine::display() const {
     }
 }
 
-void SushiCuisine::save(ofstream& ofs) const {
+void SushiCuisine::save(ofstream& ofs) const 
+{
     ofs << "Sushi Cuisine," << name << "," << price << "," << description << endl;
 }
 
 RamenCuisine::RamenCuisine(const string& name, double price, const string& description, const vector<string>& prefs)
     : JapaneseFood(name, price, description, prefs) {}
 
-void RamenCuisine::display() const {
+void RamenCuisine::display() const 
+{
     cout << "Ramen Cuisine: " << name << ", Price: " << price << ", Description: " << description << endl;
     for (const auto& pref : preferences)
     {
@@ -263,6 +283,7 @@ void RamenCuisine::display() const {
     }
 }
 
-void RamenCuisine::save(ofstream& ofs) const {
+void RamenCuisine::save(ofstream& ofs) const 
+{
     ofs << "Ramen Cuisine," << name << "," << price << "," << description << endl;
 }
