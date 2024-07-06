@@ -1,22 +1,26 @@
 #include "Order.h"
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
 
 int Order::nextOrderId = 1;
 
 Order::Order() : totalPrice(0.0), discountPercentage(0.0), deliveryOption(nullptr), orderId(nextOrderId++) {}
 
-void Order::addItem(Food* item, int quantity, const string& instruction, const string& preference) {
+// Add item to the order
+void Order::addItem(Food* item, int quantity, const string& instruction, const string& preference)
+{
     items.push_back({ item, quantity });
     specialInstructions.push_back(instruction);
     selectedPreferences.push_back(preference);
     totalPrice += item->getPrice() * quantity;
 }
 
-void Order::deleteItem(int itemIndex) {
-    if (itemIndex >= 0 && itemIndex < items.size()) {
-        totalPrice -= items[itemIndex].first->getPrice() * items[itemIndex].second;
+// Delete item from the order
+void Order::deleteItem(int itemIndex) 
+{
+    // Check if the item index is valid
+    if (itemIndex >= 0 && itemIndex < items.size()) 
+    {
+        // Update the total price
+        totalPrice -= (double)(100 - discountPercentage) / 100 * (items[itemIndex].first->getPrice() * items[itemIndex].second);
         items.erase(items.begin() + itemIndex);
         specialInstructions.erase(specialInstructions.begin() + itemIndex);
         selectedPreferences.erase(selectedPreferences.begin() + itemIndex);
@@ -26,8 +30,11 @@ void Order::deleteItem(int itemIndex) {
     }
 }
 
-void Order::modifyItem(int itemIndex, int quantity, const string& instruction, const string& preference) {
-    if (itemIndex >= 0 && itemIndex < items.size()) {
+// Modify order item
+void Order::modifyItem(int itemIndex, int quantity, const string& instruction, const string& preference) 
+{
+    if (itemIndex >= 0 && itemIndex < items.size()) // Check if the item index is valid
+    {
         totalPrice -= items[itemIndex].first->getPrice() * items[itemIndex].second;
         items[itemIndex].second = quantity;
         specialInstructions[itemIndex] = instruction;
@@ -39,8 +46,12 @@ void Order::modifyItem(int itemIndex, int quantity, const string& instruction, c
     }
 }
 
-void Order::applyDiscount(double discountPercentage) {
-    if (discountPercentage >= 0 && discountPercentage <= 100) {
+void Order::applyDiscount(double discountPercentage) 
+{
+    // Check if the discount percentage is valid
+    if (discountPercentage >= 0 && discountPercentage <= 100) 
+    {
+        // Apply the discount
         this->discountPercentage = discountPercentage;
         totalPrice -= (totalPrice * discountPercentage / 100);
     }
@@ -49,285 +60,348 @@ void Order::applyDiscount(double discountPercentage) {
     }
 }
 
-void Order::cancelOrder() {
-    items.clear();
-    specialInstructions.clear();
-    selectedPreferences.clear(); // 清除偏好
-    totalPrice = 0.0;
-    deliveryOption = nullptr;
-    paymentMethod.clear();
-    riderDetails.clear();
-}
-
-vector<pair<Food*, int>> Order::getItems() const {
+vector<pair<Food*, int>> Order::getItems() const 
+{
     return items;
 }
 
-double Order::getTotalPrice() const {
+void Order::setTotalPrice(double price) 
+{
+	totalPrice = price;
+}
+
+double Order::getTotalPrice() const 
+{
     return totalPrice;
 }
 
-void Order::setDeliveryOption(Delivery* option) {
+void Order::setDeliveryOption(Delivery* option) 
+{
     deliveryOption = option;
 }
 
-Delivery* Order::getDeliveryOption() const {
+Delivery* Order::getDeliveryOption() const 
+{
     return deliveryOption;
 }
 
-void Order::setPaymentMethod(const string& method) {
+void Order::setPaymentMethod(const string& method) 
+{
     paymentMethod = method;
 }
 
-string Order::getPaymentMethod() const {
+string Order::getPaymentMethod() const 
+{
     return paymentMethod;
 }
 
-int Order::getOrderId() const {
+int Order::getOrderId() const 
+{
     return orderId;
 }
 
-void Order::displayOrderSummary() const {
-    cout << "Order Summary (Order ID: " << orderId << "):\n";
-    for (size_t i = 0; i < items.size(); ++i) {
-        items[i].first->display();
-        cout << "Quantity: " << items[i].second << "\n";
-        cout << "Special Instruction: " << (specialInstructions[i].empty() ? "None" : specialInstructions[i]) << "\n";
-        cout << "Selected Preference: " << (selectedPreferences[i].empty() ? "None" : selectedPreferences[i]) << "\n";
-    }
-    cout << "Subtotal: $" << totalPrice << "\n";
-    if (discountPercentage > 0) {
-        cout << "Discount: " << discountPercentage << "%\n";
-    }
-    else {
-        cout << "Discount: None\n";
-    }
-    if (deliveryOption) {
-        deliveryOption->display();
-        cout << "Delivery Fee: $" << deliveryOption->getFee() << "\n";
-        cout << "Total Price: $" << totalPrice + deliveryOption->getFee() << "\n";
-    }
-    else {
-        cout << "No delivery option selected.\n";
-    }
-    cout << "Payment Method: " << paymentMethod << "\n";
+double Order::getDiscountPercentage() const 
+{
+	return discountPercentage;
 }
 
-void Order::displayConfirmation() const {
-    cout << "Order Confirmation:\n";
-    cout << "Order ID: " << orderId << "\n";
-
-    for (size_t i = 0; i < items.size(); ++i) {
+// Display order summary
+void Order::displayOrderSummary(bool inOrder) const 
+{
+    cout << "Order ID: " << orderId << endl << endl;
+    for (int i = 0; i < items.size(); i++) 
+    {
+        cout << "Item " << i + 1 << ":" << endl;
         items[i].first->display();
-        cout << "Quantity: " << items[i].second << "\n";
-        cout << "Special Instruction: " << (specialInstructions[i].empty() ? "None" : specialInstructions[i]) << "\n";
-        cout << "Selected Preference: " << (selectedPreferences[i].empty() ? "None" : selectedPreferences[i]) << "\n";
+        cout << "Quantity: " << items[i].second << endl;
+        cout << "Special Instruction: " << (specialInstructions[i].empty() ? "None" : specialInstructions[i]) << endl;
+        cout << "Selected Preference: " << (selectedPreferences[i].empty() ? "None" : selectedPreferences[i]) << endl;
+        cout << "-----------------------------------" << endl;
     }
-    cout << "Subtotal: $" << totalPrice << "\n";
-    if (discountPercentage > 0) {
-        cout << "Discount: " << discountPercentage << "%\n";
-    }
-    else {
-        cout << "Discount: None\n";
-    }
-    if (deliveryOption) {
-        deliveryOption->display();
-        cout << "Delivery Fee: $" << deliveryOption->getFee() << "\n";
-        cout << "Total Price: $" << totalPrice + deliveryOption->getFee() << "\n";
+    cout << "Subtotal: $" << totalPrice << endl;
+    if (discountPercentage > 0) 
+    {
+        cout << "Discount: " << discountPercentage << "%" << endl;
     }
     else {
-        cout << "No delivery option selected.\n";
+        cout << "Discount: None" << endl;
     }
-    cout << "Payment Method: " << paymentMethod << "\n";
+    deliveryOption->display();
+    cout << "Delivery Fee: $" << deliveryOption->getFee() << endl;
+    cout << "Total Price: $" << totalPrice + deliveryOption->getFee() << endl;
+
+    if(!inOrder)
+    {
+        // Display payment method only if not in order
+        cout << "Payment Method: " << paymentMethod << endl;
+    }
 }
 
-void Order::setRiderDetails(const string& details) {
+// Display order confirmation
+void Order::displayConfirmation() const 
+{
+    cout << GREEN << "=== Order Confirmation ===" << RESET << endl;
+    cout << "Order ID: " << orderId << endl << endl;
+
+    for (int i = 0; i < items.size(); i++) 
+    {
+        // Display all items in the order
+        cout << "Item " << i + 1 << ":" << endl;
+        items[i].first->display();
+        cout << "Quantity: " << items[i].second << endl;
+        cout << "Special Instruction: " << (specialInstructions[i].empty() ? "None" : specialInstructions[i]) << endl;
+        cout << "Selected Preference: " << (selectedPreferences[i].empty() ? "None" : selectedPreferences[i]) << endl;
+        cout << "-----------------------------------" << endl;
+    }
+    cout << "Subtotal: $" << totalPrice << endl;
+    if (discountPercentage > 0) 
+    {
+        cout << "Discount: " << discountPercentage << "%" << endl;
+    }
+    else {
+        cout << "Discount: None" << endl;
+    }
+    deliveryOption->display();
+    cout << "Delivery Fee: $" << deliveryOption->getFee() << endl;
+    cout << "Total Price: $" << totalPrice + deliveryOption->getFee() << endl;
+    cout << "Payment Method: " << paymentMethod << endl;
+    cout<< GREEN << "==========================" << endl << endl;
+}
+
+void Order::setRiderDetails(const string& details) 
+{
     riderDetails = details;
 }
 
-vector<string> Order::getSpecialInstructions() const {
+vector<string> Order::getSpecialInstructions() const 
+{
     return specialInstructions;
 }
 
-vector<string> Order::getSelectedPreferences() const {
+vector<string> Order::getSelectedPreferences() const 
+{
     return selectedPreferences;
 }
 
-void Order::saveOrder(ofstream& ofs) const {
+// Write order details to the file
+void Order::saveOrder(ofstream& ofs) const 
+{
     ofs << orderId << ","
         << paymentMethod << ","
         << totalPrice << ","
         << (deliveryOption ? deliveryOption->getName() : "None") << ","
-        << restaurantName << "\n";
-    for (size_t i = 0; i < items.size(); ++i) {
+        << restaurantName << "," << discountPercentage << endl;
+    for (int i = 0; i < items.size(); i++) 
+    {
         ofs << items[i].first->getName() << ","
             << items[i].first->getPrice() << ","
             << items[i].first->getDescription() << ","
             << items[i].second;
+        // Write special instructions and selected preferences if they exist
         ofs << "," << (specialInstructions[i].empty() ? "" : specialInstructions[i]);
         ofs << "," << (selectedPreferences[i].empty() ? "" : selectedPreferences[i]);
         ofs << endl;
     }
+
     ofs << endl; // Use an empty line to separate orders
 }
 
-void Order::setRestaurantName(const string& name) {
+void Order::setRestaurantName(const string& name) 
+{
     restaurantName = name;
 }
 
-vector<Order> Order::loadOrders(const string& filename, const vector<Restaurant>& restaurants) {
+vector<Order> Order::loadOrders(const string& filename, const vector<Restaurant>& restaurants) 
+{
     vector<Order> orders;
-    ifstream ifs(filename);
-    if (!ifs.is_open()) {
+    ifstream pastOrderData(filename);
+    if (!pastOrderData.is_open()) 
+    {
         return orders;  // If file does not exist, return an empty vector
     }
 
+    // If file exists, read orders from the file
     string line;
-    while (getline(ifs, line)) {
+    while (getline(pastOrderData, line)) 
+    {
         stringstream ss(line);
         string token;
 
         Order order;
-        // 读取 orderId
+
+        // Read orderId
         getline(ss, token, ',');
         try {
-            order.orderId = stoi(token);
+            order.orderId = stoi(token); // Convert string to integer
         }
-        catch (const invalid_argument& e) {
-            cerr << "Invalid orderId in line: " << line << endl;
-            continue;  // 跳过此行并继续处理下一行
+        catch (const invalid_argument& e)
+        {
+            cerr << RED << "Invalid orderId" << RESET << endl;
+            continue;  // Skip this line and continue with the next line
         }
 
-        if (order.orderId >= nextOrderId) {
+        if (order.orderId >= nextOrderId) 
+        {
             nextOrderId = order.orderId + 1;
         }
 
-        // 读取 paymentMethod
+        // Read paymentMethod
         getline(ss, order.paymentMethod, ',');
 
-        // 读取 totalPrice
+        // Read totalPrice
         getline(ss, token, ',');
         try {
             order.totalPrice = stod(token);
         }
-        catch (const invalid_argument& e) {
-            cerr << "Invalid totalPrice in line: " << line << endl;
-            continue;  // 跳过此行并继续处理下一行
+        catch (const invalid_argument& e) 
+        {
+            cerr << RED << "Invalid totalPrice" << RESET << endl;
+            continue;  // Skip this line and continue with the next line
         }
 
-        // 读取 deliveryOption
+        // Read deliveryOption
         getline(ss, token, ',');
-        if (token == "Direct Delivery") {
+        if (token == "Direct Delivery") 
+        {
             order.setDeliveryOption(new DirectDelivery("Direct Delivery", 30, 5.0));
         }
-        else if (token == "Standard Delivery") {
+        else if (token == "Standard Delivery") 
+        {
             order.setDeliveryOption(new StandardDelivery("Standard Delivery", 45, 3.0));
         }
-        else if (token == "Saver Delivery") {
+        else if (token == "Saver Delivery") 
+        {
             order.setDeliveryOption(new SaverDelivery("Saver Delivery", 60, 2.0));
         }
         else {
             order.setDeliveryOption(nullptr);
         }
 
-        // 读取 restaurantName
+        // Read restaurantName
         getline(ss, order.restaurantName, ',');
 
-        // 找到对应的餐厅
+        // Find the target restaurant
         const Restaurant* restaurant = Restaurant::getRestaurantByName(order.restaurantName, restaurants);
-        if (!restaurant) {
-            cerr << "Restaurant not found in orders: " << order.restaurantName << endl;
-            continue;  // 跳过此行并继续处理下一行
+        if (!restaurant) 
+        {
+            cerr << RED << "Restaurant not found in orders: " << order.restaurantName << RESET << endl;
+            continue;  // Skip this order and continue with the next order
         }
 
-        // 读取后续行（食品项）
-        while (getline(ifs, line) && !line.empty() && line.find(",") != string::npos) {
+        // Read discountPercentage
+        getline(ss, token, ',');
+        try {
+			order.discountPercentage = stod(token);
+		}
+		catch (const invalid_argument& e) 
+		{
+			cerr << RED << "Invalid discountPercentage" << RESET << endl;
+			continue;  // Skip this order and continue with the next order
+		}
+
+        // Read food items
+        while (getline(pastOrderData, line) && !line.empty() && line.find(",") != string::npos) 
+        {
             stringstream itemStream(line);
             string name, description, instruction, preference;
             double price;
             int quantity;
 
-            // 读取名称
+            // Read item name
             getline(itemStream, name, ',');
 
-            // 读取价格
+            // Read price
             getline(itemStream, token, ',');
             try {
                 price = stod(token);
             }
-            catch (const invalid_argument& e) {
-                cerr << "Invalid price in line: " << line << endl;
-                continue;  // 跳过此行并继续处理下一行
+            catch (const invalid_argument& e)
+            {
+                cerr << "Invalid price" << endl;
+                continue;  // Skip this line and continue with the next line
             }
 
-            // 读取描述
+            // Read description
             getline(itemStream, description, ',');
 
-            // 读取数量
+            // Read quantity
             getline(itemStream, token, ',');
             try {
                 quantity = stoi(token);
             }
-            catch (const invalid_argument& e) {
-                cerr << "Invalid quantity in line: " << line << endl;
-                continue;  // 跳过此行并继续处理下一行
+            catch (const invalid_argument& e)
+            {
+                cerr << "Invalid quantity" << endl;
+                continue;  // Skip this line and continue with the next line
             }
 
-            // 读取特别说明，如果存在
-            if (getline(itemStream, instruction, ',')) {
+            // Read special instruction, if exists
+            if (getline(itemStream, instruction, ',')) 
+            {
                 instruction = instruction;
             }
             else {
                 instruction = "";
             }
 
-            // 读取偏好，如果存在
-            if (getline(itemStream, preference, ',')) {
+            // Read preference, if exists
+            if (getline(itemStream, preference, ',')) 
+            {
                 preference = preference;
             }
             else {
                 preference = "";
             }
 
-            // 动态确定食品类型
+            // Determine the type of food item
             Food* food = nullptr;
             string type = restaurant->getType();
-            if (type == "Sichuan") {
+            if (type == "Sichuan") 
+            {
                 food = new SichuanCuisine(name, price, description);
             }
-            else if (type == "Cantonese") {
+            else if (type == "Cantonese") 
+            {
                 food = new CantoneseCuisine(name, price, description);
             }
-            else if (type == "Italian") {
+            else if (type == "Italian") 
+            {
                 food = new ItalianCuisine(name, price, description);
             }
-            else if (type == "French") {
+            else if (type == "French") 
+            {
                 food = new FrenchCuisine(name, price, description);
             }
-            else if (type == "Lebanese") {
+            else if (type == "Lebanese") 
+            {
                 food = new LebaneseCuisine(name, price, description);
             }
-            else if (type == "Moroccan") {
+            else if (type == "Moroccan") 
+            {
                 food = new MoroccanCuisine(name, price, description);
             }
-            else if (type == "TexMex") {
+            else if (type == "TexMex") 
+            {
                 food = new TexMexCuisine(name, price, description);
             }
-            else if (type == "TraditionalMexican") {
+            else if (type == "TraditionalMexican") 
+            {
                 food = new TraditionalMexicanCuisine(name, price, description);
             }
-            else if (type == "Sushi") {
+            else if (type == "Sushi") 
+            {
                 food = new SushiCuisine(name, price, description);
             }
-            else if (type == "Ramen") {
+            else if (type == "Ramen") 
+            {
                 food = new RamenCuisine(name, price, description);
             }
             else {
                 cerr << "Unknown food type: " << type << endl;
-                continue;  // 跳过此行并继续处理下一行
+                continue;  // Skip this line and continue with the next line
             }
 
-            // 添加食品项到订单中
+            // Add the item to the order
             order.addItem(food, quantity, instruction, preference);
         }
         orders.push_back(order);
@@ -338,11 +412,14 @@ vector<Order> Order::loadOrders(const string& filename, const vector<Restaurant>
 
 void Order::saveOrders(const string& filename, const vector<Order>& orders) {
     ofstream ofs(filename);
-    if (!ofs.is_open()) {
+    if (!ofs.is_open()) 
+    {
         throw runtime_error("Could not open file for writing: " + filename);
     }
 
-    for (const auto& order : orders) {
+    // Write each order to the file
+    for (const auto& order : orders) 
+    {
         order.saveOrder(ofs);
     }
 }

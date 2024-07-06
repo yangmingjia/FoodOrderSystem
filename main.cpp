@@ -38,7 +38,7 @@ int main()
                 foodOrderSystem.modifyOrder();
                 break;
             case 7:
-                cout << "Exiting program.\n";
+                cout << GREEN << "Exiting program." << RESET << endl;
                 return 0;
             default:
                 system("cls");

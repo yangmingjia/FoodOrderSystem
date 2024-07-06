@@ -122,7 +122,8 @@ public:
     void save(ofstream&) const override;
 };
 
-class TraditionalMexicanCuisine : public MexicanFood {
+class TraditionalMexicanCuisine : public MexicanFood 
+{
 public:
     TraditionalMexicanCuisine(const string&, double, const string&, const vector<string> & = {});
     void display() const override;
@@ -130,21 +131,24 @@ public:
 };
 
 // Japanese food
-class JapaneseFood : public Food {
+class JapaneseFood : public Food 
+{
 public:
     JapaneseFood(const string&, double, const string&, const vector<string> & = {});
     void display() const override;
     void save(ofstream&) const override;
 };
 
-class SushiCuisine : public JapaneseFood {
+class SushiCuisine : public JapaneseFood 
+{
 public:
     SushiCuisine(const string&, double, const string&, const vector<string> & = {});
     void display() const override;
     void save(ofstream&) const override;
 };
 
-class RamenCuisine : public JapaneseFood {
+class RamenCuisine : public JapaneseFood 
+{
 public:
     RamenCuisine(const string&, double, const string&, const vector<string> & = {});
     void display() const override;
