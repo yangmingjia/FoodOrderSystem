@@ -44,7 +44,7 @@ bool LoginSystem::login(const string& username, const string& password)
 }
 
 // Prompts user to login
-void LoginSystem::Login() 
+string LoginSystem::Login() 
 {
     string username, password;
     bool loggedIn = false;
@@ -64,6 +64,8 @@ void LoginSystem::Login()
         {
             loggedIn = true;
             cout << GREEN << "Login successful!" << RESET << endl;
+            currentUser = username;
+            return currentUser;
         }
         else {
             system("cls");

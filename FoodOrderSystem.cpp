@@ -1,10 +1,9 @@
 #include "FoodOrderSystem.h"
 
-FoodOrderSystem::FoodOrderSystem() 
+FoodOrderSystem::FoodOrderSystem()
 {
     initializeRestaurants();
     loadRiders("riders.csv"); // Load riders from CSV file
-    loadOrders("orders.csv");  // Load past orders from CSV file
 }
 
 // Initialize restaurants and their menus from CSV files
@@ -199,13 +198,15 @@ void FoodOrderSystem::loadMenuPreference(const string& filename)
 // Load past orders from CSV file
 void FoodOrderSystem::loadOrders(const string& filename)
 {
-    orders = Order::loadOrders(filename, restaurants); // Pass the restaurants vector to loadOrders function
+    pair<vector<Order>, vector<Order>> orderPair  = Order::loadOrders(filename, restaurants, currentUser); // Pass the restaurants vector to loadOrders function
+    orders = orderPair.first;
+    allOrders = orderPair.second;
 }
 
 // Save all orders to the "orders.csv" file
 void FoodOrderSystem::saveOrders(const string& filename)
 {
-    Order::saveOrders(filename, orders);
+    Order::saveOrders(filename, allOrders);
 }
 
 // Load riders from CSV file
@@ -235,6 +236,17 @@ void FoodOrderSystem::loadRiders(const string& filename)
     ifs.close(); // Close the file
 }
 
+void FoodOrderSystem::setLoggedInUser(const string& username) 
+{
+	currentUser = username;
+    loadOrders("orders.csv");  // Load past orders from CSV file
+}
+
+string FoodOrderSystem::getLoggedInUser() const 
+{
+	return currentUser;
+}
+
 void FoodOrderSystem::newFoodOrder()
 {
     try {
@@ -252,6 +264,7 @@ void FoodOrderSystem::newFoodOrder()
 
         Restaurant& selectedRestaurant = restaurants[choice - 1];
         Order order;
+        order.setCurrentUser(currentUser);
         order.setRestaurantName(selectedRestaurant.getName());
         
         vector<Food*> menu = selectedRestaurant.getMenu(); // Get the menu of the selected restaurant
@@ -406,6 +419,7 @@ void FoodOrderSystem::newFoodOrder()
 
         // Add the order to the orders vector and save the orders to the file
         orders.push_back(order);
+        allOrders.push_back(order);
         saveOrders("orders.csv");
     }
     catch (const exception& e) 
@@ -420,6 +434,10 @@ void FoodOrderSystem::viewPastOrders()
     try {
         system("cls");
         cout << BOLD << BLUE << "===== Past Orders =====" << RESET << endl;
+        if(orders.empty())
+		{
+			throw exception("No past orders found.\n");
+		}
         for (const auto& order : orders) 
         {
             cout << endl;
@@ -460,6 +478,8 @@ void FoodOrderSystem::reorder()
         {
             Order oldOrder = *orderPtr;
             Order newOrder;  // Create a new order
+
+            newOrder.setCurrentUser(currentUser);
 
             for (int i = 0; i < oldOrder.getItems().size(); i++) 
             {
@@ -522,6 +542,7 @@ void FoodOrderSystem::reorder()
 
             // Add the new order to the orders vector and save the orders to the file
             orders.push_back(newOrder);
+            allOrders.push_back(newOrder);
             saveOrders("orders.csv");
         }
         else {
@@ -563,6 +584,18 @@ void FoodOrderSystem::deleteOrder()
             auto orderIndex = distance(&orders[0], orderPtr); // Get the index of the order
             orders.erase(orders.begin() + orderIndex); // Erase the order from the orders vector
             cout << GREEN << "Order " << orderId << " deleted successfully." << RESET <<endl;
+
+            // Delete the order from the allOrders vector
+            for (auto& o : allOrders)
+            {
+                if (o.getOrderId() == orderId)
+                {
+                    orderPtr = &o;
+                    break;
+                }
+            }
+            orderIndex = distance(&allOrders[0], orderPtr); // Get the index of the order
+            allOrders.erase(allOrders.begin() + orderIndex); // Erase the order from the allOrders vector
 
             saveOrders("orders.csv");  // Save all orders to file
         }
@@ -693,6 +726,17 @@ void FoodOrderSystem::modifyOrder()
                 // Apply the new discount
                 order.applyDiscount(discount);
             }
+
+            //Modify allOrders vector
+            for (auto& o : allOrders)
+			{
+				if (o.getOrderId() == orderId)
+				{
+					orderPtr = &o;
+					break;
+				}
+			}
+            orderPtr->setItems(order.getItems());
 
             // Save modified orders to file
             saveOrders("orders.csv");

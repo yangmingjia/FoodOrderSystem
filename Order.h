@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <utility>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -18,6 +19,7 @@ class Order
 private:
     static int nextOrderId;
     int orderId;
+    string currentUser;
     vector<pair<Food*, int>> items; // pair<Food*, quantity>
     vector<string> specialInstructions;
     vector<string> selectedPreferences;
@@ -36,6 +38,7 @@ public:
     void modifyItem(int, int, const string&, const string&); // Modify order item
     void applyDiscount(double);
 
+    void setItems(const vector<pair<Food*, int>>&);
     vector<pair<Food*, int>> getItems() const; 
 
     void setTotalPrice(double);
@@ -56,13 +59,15 @@ public:
 
     void setRiderDetails(const string&);
 
+    void setCurrentUser(const string&);
+        
     vector<string> getSpecialInstructions() const;
     vector<string> getSelectedPreferences() const;
 
     void saveOrder(ofstream&) const;
     void setRestaurantName(const string&);
 
-    static vector<Order> loadOrders(const string&, const vector<Restaurant>&);
+    static pair<vector<Order>, vector<Order>> loadOrders(const string&, const vector<Restaurant>&, const string&);
     static void saveOrders(const string&, const vector<Order>&);
 };
 

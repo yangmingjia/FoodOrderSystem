@@ -12,7 +12,9 @@ int main()
         FoodOrderSystem foodOrderSystem;
 
         int choice;
-        // login.Login();
+        string currentUser = login.Login();
+        foodOrderSystem.setLoggedInUser(currentUser); // Set the username of the current user
+
         while (true)
         {
             displayMenu();

@@ -60,6 +60,11 @@ void Order::applyDiscount(double discountPercentage)
     }
 }
 
+void Order::setItems(const vector<pair<Food*, int>>& items) 
+{
+	this->items = items;
+}
+
 vector<pair<Food*, int>> Order::getItems() const 
 {
     return items;
@@ -173,6 +178,11 @@ void Order::setRiderDetails(const string& details)
     riderDetails = details;
 }
 
+void Order::setCurrentUser(const string& user) 
+{
+	currentUser = user;
+}
+
 vector<string> Order::getSpecialInstructions() const 
 {
     return specialInstructions;
@@ -186,7 +196,8 @@ vector<string> Order::getSelectedPreferences() const
 // Write order details to the file
 void Order::saveOrder(ofstream& ofs) const 
 {
-    ofs << orderId << ","
+    ofs << currentUser << ","
+        << orderId << ","
         << paymentMethod << ","
         << totalPrice << ","
         << (deliveryOption ? deliveryOption->getName() : "None") << ","
@@ -211,13 +222,14 @@ void Order::setRestaurantName(const string& name)
     restaurantName = name;
 }
 
-vector<Order> Order::loadOrders(const string& filename, const vector<Restaurant>& restaurants) 
+pair<vector<Order>, vector<Order>> Order::loadOrders(const string& filename, const vector<Restaurant>& restaurants, const string& currUser)
 {
     vector<Order> orders;
+    vector<Order> allOrders;
     ifstream pastOrderData(filename);
     if (!pastOrderData.is_open()) 
     {
-        return orders;  // If file does not exist, return an empty vector
+        return make_pair(orders, allOrders);  // If file does not exist, return an empty vector pair
     }
 
     // If file exists, read orders from the file
@@ -226,8 +238,10 @@ vector<Order> Order::loadOrders(const string& filename, const vector<Restaurant>
     {
         stringstream ss(line);
         string token;
-
         Order order;
+
+        // Read currentUser
+        getline(ss, order.currentUser, ',');
 
         // Read orderId
         getline(ss, token, ',');
@@ -352,7 +366,7 @@ vector<Order> Order::loadOrders(const string& filename, const vector<Restaurant>
             else {
                 preference = "";
             }
-
+                        
             // Determine the type of food item
             Food* food = nullptr;
             string type = restaurant->getType();
@@ -404,13 +418,22 @@ vector<Order> Order::loadOrders(const string& filename, const vector<Restaurant>
             // Add the item to the order
             order.addItem(food, quantity, instruction, preference);
         }
+
+        // Check if the current user is the same as the user who placed the order
+        if (order.currentUser != currUser)
+        {
+            allOrders.push_back(order);
+            continue;
+        }
+        allOrders.push_back(order);
         orders.push_back(order);
     }
 
-    return orders;
+    return make_pair(orders,allOrders);
 }
 
-void Order::saveOrders(const string& filename, const vector<Order>& orders) {
+void Order::saveOrders(const string& filename, const vector<Order>& orders) 
+{
     ofstream ofs(filename);
     if (!ofs.is_open()) 
     {
