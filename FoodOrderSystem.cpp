@@ -436,7 +436,7 @@ void FoodOrderSystem::viewPastOrders()
         cout << BOLD << BLUE << "===== Past Orders =====" << RESET << endl;
         if(orders.empty())
 		{
-			throw exception("No past orders found.\n");
+			throw runtime_error("No past orders found.\n");
 		}
         for (const auto& order : orders) 
         {
