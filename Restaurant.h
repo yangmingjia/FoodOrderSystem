@@ -23,7 +23,7 @@ public:
     string getName() const;
     string getType() const;
     vector<Food*> getMenu() const;
-    static const Restaurant* getRestaurantByName(const string& name, const vector<Restaurant>& restaurants);
+    static const Restaurant* getRestaurantByName(const string&, const vector<Restaurant>&);
     void displayMenu() const;
     void saveMenu(const string&) const;
 };

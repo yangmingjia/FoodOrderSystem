@@ -419,6 +419,8 @@ pair<vector<Order>, vector<Order>> Order::loadOrders(const string& filename, con
             order.addItem(food, quantity, instruction, preference);
         }
 
+        order.applyDiscount(order.discountPercentage); // Apply discount to the order
+
         // Check if the current user is the same as the user who placed the order
         if (order.currentUser != currUser)
         {
